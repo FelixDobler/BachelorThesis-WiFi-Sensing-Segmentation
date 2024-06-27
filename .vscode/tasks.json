@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Mount sshfs",
+            "type": "shell",
+            "command": "sshfs -o default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 BaProj2:/home/felix/csi_recordings csi_recordings/",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "runOptions": {
+                "runOn": "folderOpen",
+            }
+        },
+        {
+            "label": "Refresh file view",
+            "command": "${command:workbench.files.action.refreshFilesExplorer}",
+            "dependsOn": "Mount sshfs",
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        }
+    ]
+}
