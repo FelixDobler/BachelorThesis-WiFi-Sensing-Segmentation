@@ -29,7 +29,7 @@ class CSI_Struct:
         self.csi_len = csi_len
         self.buf_len = buf_len
 
-def transformData(inputPath, outputPath = None, amplitudeOnly = True):
+def transformData(inputPath, outputPath = None, amplitudeOnly = True, bigChannel = False):
     """
     Transforms the data from the inputPath to a joblib file at outputPath
     The format of the exported data is a tuple of two lists:
@@ -42,14 +42,22 @@ def transformData(inputPath, outputPath = None, amplitudeOnly = True):
     if not outputPath:
         outputPath = inputPath + ".joblib"
     
+    nSubC = 56 if not bigChannel else 114
+
     # define the csi_struct
     csi_struct_format = "QHBBBBBBBBBBBHHHxxxx"
     csi_struct_size = struct.calcsize(csi_struct_format)
 
     # define the COMPLEX array
-    complex_format = "ii"
-    complex_size = struct.calcsize(complex_format)
-    csi_matrix_size = 3 * 3 * 114 * complex_size
+    csi_single_value_format = "ixxxx" if amplitudeOnly else "ii"
+    
+    if bigChannel:
+        csi_ap_format = csi_single_value_format * nSubC
+    else:
+        csi_ap_format = csi_single_value_format * nSubC + (114 - nSubC) * (8 * "x")
+    csi_ap_format_size = struct.calcsize(csi_ap_format)
+
+    csi_matrix_size = 3 * 3 * csi_ap_format_size
 
     record_size = csi_struct_size + csi_matrix_size
 
@@ -71,7 +79,10 @@ def transformData(inputPath, outputPath = None, amplitudeOnly = True):
         presumed_num_records = int(presumed_num_records)
 
 
-        csi_matrices_shape = (presumed_num_records, 3, 3, 114) if amplitudeOnly else (presumed_num_records, 3, 3, 114,2)
+        csi_matrices_shape = (presumed_num_records, 3, 3, nSubC)
+        if not amplitudeOnly:
+            # add a nested dimension for the real and imaginary parts
+            csi_matrices_shape +=  (2,)
 
         csiStatusL = []
         csiMatrices = np.empty(csi_matrices_shape, dtype=np.int16)
@@ -81,51 +92,51 @@ def transformData(inputPath, outputPath = None, amplitudeOnly = True):
 
                     print(f"record n {currentRecordNumber}, {f.tell() / file_size * 100:.2f}% complete")
                     csi_status = read_csi_struct(f, csi_struct_format, csi_struct_size)
-                    csi_matrix = read_csi_matrix(f, complex_format, complex_size)
-
-                    if amplitudeOnly:
-                        csi_matrix = extract_amplitude(csi_matrix)
+                    # print(f"nr: {csi_status.nr}, nc: {csi_status.nc}, chanBW: {csi_status.chanBW}, num_tones: {csi_status.num_tones}")
+                    read_csi_matrix(f, csiMatrices, csi_ap_format, csi_ap_format_size, amplitudeOnly, bigChannel, currentRecordNumber)
                     
-                    # print(.shape, csi_amp.dtype)
+                    # assert np.count_nonzero(csiMatrices[currentRecordNumber,0,0,56:]) == 0, "Non zero values in the second half of the subcarriers"
+                    
                     csiStatusL.append(csi_status)
-                    csiMatrices[currentRecordNumber] = csi_matrix
+
                     # records.append((csi, csi_matrix))   
             # npaa.append(np.array(records, dtype=object))
     # records = (csiStatusL, csiMatrixL)
     joblib.dump((csiStatusL, csiMatrices), outputPath)
     print(csiMatrices.shape, csiMatrices.dtype)
 
-    print(f"{'csi:big np array'} - Transformed {len(csiStatusL)} records in {time.time() - startTime:.2f} seconds")
+    print(f"{'csi:big np array + singleCSImat nparray + ignore phase during read'} - Transformed {len(csiStatusL)} records in {time.time() - startTime:.2f} seconds")
 
     return (csiStatusL, csiMatrices)
-
-
-def extract_amplitude(csi_matrix):
-    return csi_matrix[:, :, :, 0]
 
 def read_csi_struct(f, csi_struct_format, csi_struct_size):
     csi_struct_data = f.read(csi_struct_size)
     csi_struct_values = struct.unpack(csi_struct_format, csi_struct_data)
     return CSI_Struct(*csi_struct_values)
 
-def read_csi_matrix(f, complex_format, complex_size) -> np.ndarray:
-    complex_array = []
-    for _ in range(3):
-        matrix = []
-        for _ in range(3):
-            subcarriers = []
-            for _ in range(114):
-                complex_data = f.read(complex_size)
-                real, imag = struct.unpack(complex_format, complex_data)
-                subcarriers.append([real, imag])
-            matrix.append(subcarriers)
-        complex_array.append(matrix)
-    return np.array(complex_array, dtype=np.int16)
+def read_csi_matrix(f, csiMatrices, ap_values_format, ap_format_size, amplitudeOnly, bigChannel, currentRecordNumber):
+    for rx in range(3):
+        for tx in range(3):
+            # for _ in range(114):
+            data = f.read(ap_format_size)
+
+            values = struct.unpack(ap_values_format, data)
+
+            if not amplitudeOnly:
+                csiMatrices[currentRecordNumber, rx, tx] = np.array(values, dtype=np.int16).reshape((114, 2))
+            else:
+                csiMatrices[currentRecordNumber, rx, tx] = np.array(values, dtype=np.int16)
+ 
+
+            # subcarriers = np.array(values, dtype=np.int16).reshape((114, 2))
+            # subcarriers.append([real, imag])
+            # csi_matrix[rx, tx] = subcarriers
+
 
 # use file from first cli argument
 FILE = sys.argv[1]
 
-records = transformData(FILE, f"{FILE}_int16.joblib")
+records = transformData(FILE, f"{FILE}_testing_56.joblib", True, False)
 print(f"Num records: {len(records[0])}")
 print(records[1][0][0][0][0], records[1][0].dtype)
 
