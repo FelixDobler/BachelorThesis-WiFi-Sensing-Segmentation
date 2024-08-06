@@ -1,0 +1,12 @@
+csi:list of nparrays                                            - 54.19 seconds
+csi:matrices nparray                                            - 49.98 seconds
+csi:matrices nparray + big read                                 - 15.12 seconds
+csi:matrices nparray + br + singleCSImat nparray                - 13.48 seconds
+csi:matrices nparray + br + directArray + ignore phase in read  - 10.35 seconds
+csi:matrices nparray + br + da + ip + discard unused carriers   -  8.71 seconds
+
+
+
+Storage:
+switch to int16         -> ½
+only extract amplitude  -> ½

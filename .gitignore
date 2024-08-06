@@ -1,2 +1,7 @@
 *.avi
 *.mp4
+.venv/
+reference/
+plots/raw_vs_preprocessed/butterworth_parameters
+data/*
+csi_recordings
