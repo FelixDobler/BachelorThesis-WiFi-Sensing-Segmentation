@@ -1,17 +1,17 @@
 import h5py
 import numpy as np
-from ..types import CSIDataLoader
+from ..types import CSIDataLoader, CSI_Result
 
 class HDF5DataLoader(CSIDataLoader):
     def load(filename: str):
         file =  h5py.File(filename)
 
-        data_names = [keyName for keyName in file.keys() if keyName.startswith('data')]
-        assert len(data_names) == 1
+        key_name = list(file.keys())[0]
 
-        data = file[data_names[0]]
+        data = file[key_name]
         csi = np.array(data)
 
         # TODO check for data loaded in correct order
         # assert 
-        return csi
+
+        return CSI_Result(None, csi)

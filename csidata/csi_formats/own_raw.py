@@ -23,7 +23,7 @@ class RawOwnDataLoader(CSIDataLoader):
                 else:
                     csiMatrix[currentRecordNumber, rx, tx] = np.array(values, dtype=np.int16)
 
-    def load(filename, amplitudeOnly = True, bigChannel = False) -> CSI_Result:
+    def load(filename, amplitudeOnly = True, bigChannel = False, verbose = False) -> CSI_Result:
         nSubC = 56 if not bigChannel else 114
 
         # define the csi_struct
@@ -71,7 +71,7 @@ class RawOwnDataLoader(CSIDataLoader):
             i = 0
             while file_size - f.tell() >= record_size:
                         currentRecordNumber = f.tell() // record_size
-                        if currentRecordNumber % print_frequency == 0:
+                        if verbose and currentRecordNumber % print_frequency == 0:
                             print(f"reading record {currentRecordNumber}/{presumed_num_records}, {f.tell() / file_size * 100:.2f}% complete")
                         csi_status = RawOwnDataLoader.read_csi_struct(f, csi_struct_format, csi_struct_size)
                         RawOwnDataLoader.read_csi_matrix(f, csiMatrix, csi_antenna_pair_format, csi_antenna_pair_format_size, amplitudeOnly, bigChannel, currentRecordNumber)

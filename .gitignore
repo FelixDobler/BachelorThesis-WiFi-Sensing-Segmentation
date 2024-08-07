@@ -1,5 +1,7 @@
 *.avi
 *.mp4
+__pycache__/
+*.py[cod]
 .venv/
 reference/
 plots/raw_vs_preprocessed/butterworth_parameters
