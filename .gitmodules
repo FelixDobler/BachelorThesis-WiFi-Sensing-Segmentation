@@ -1,0 +1,3 @@
+[submodule "DeepSeg"]
+	path = DeepSeg
+	url = ssh://git@gitlab.dbvis.de:2222/dobler/bachelor-deepseg.git
