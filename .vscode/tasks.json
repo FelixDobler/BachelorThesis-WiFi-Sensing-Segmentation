@@ -2,25 +2,58 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Mount sshfs",
+            "label": "Upload file",
             "type": "shell",
-            "command": "sshfs -o default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 BaProj2:/home/felix/csi_recordings csi_recordings/",
-            "group": "none",
+            "command": "scp ${file} BaProj2:~/${relativeFile}",
+        },
+        {
+            "label": "BaProj2",
+            "type": "shell",
+            "command": "ssh BaProj2",
             "presentation": {
-                "reveal": "always",
                 "panel": "new"
             },
+            "runOptions": {"runOn": "folderOpen"}
+        },
+        {
+            "label": "Mount data",
+            "group": "none",
+            "dependsOn": [
+                "Mount csi",
+                "Mount video",
+                "Refresh file view"
+            ],
             "runOptions": {
-                "runOn": "folderOpen",
+                "runOn": "folderOpen"
+            }
+        },
+        {
+            "label": "Mount csi",
+            "type": "shell",
+            "command": "mountpoint -q recordings/csi && echo 'dir is already mounted' || sshfs -o default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 BaProj2:/root/record/recordings/csi recordings/csi",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "new",
+                "group": "mount_recordings"
+            }
+        },
+        {
+            "label": "Mount video",
+            "type": "shell",
+            "command": "mountpoint -q recordings/video && echo 'dir is already mounted' || sshfs -o default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 BaProj2:/root/record/recordings/video recordings/video",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "new",
+                "group": "mount_recordings"
             }
         },
         {
             "label": "Refresh file view",
             "command": "${command:workbench.files.action.refreshFilesExplorer}",
-            "dependsOn": "Mount sshfs",
-            "runOptions": {
-                "runOn": "folderOpen"
-            }
+            "dependsOn": [
+                "Mount csi",
+                "Mount video"
+            ]
         }
     ]
-}f
+}

@@ -6,4 +6,4 @@ __pycache__/
 reference/
 plots/raw_vs_preprocessed/butterworth_parameters
 data/*
-csi_recordings
+recordings/*/*

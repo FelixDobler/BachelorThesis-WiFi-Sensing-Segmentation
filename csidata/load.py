@@ -6,14 +6,19 @@ from .csi_formats.own_raw import RawOwnDataLoader
 from .csi_formats.joblib import JoblibDataLoader
 from .csi_formats.hdf5 import HDF5DataLoader
 from .csi_formats.mat import MatDataLoader
+from .stats import get_sample_rate
+from . import config
 
 def load(filename: str, format: Optional[FileFormat] = None):
     if format is None:
         format = detect_format(filename)
-        print(f"Detected file format: {format.name}")
+        print(f"verbose: {config.be_verbose}")
+        if config.be_verbose:
+            print(f"Detected file format: {format.name}")
 
     data = load_classes[format].load(filename)
     check_csi_shape(data.csi)
+    get_sample_rate(data)
     return data
 
 def detect_format(filename: str):
