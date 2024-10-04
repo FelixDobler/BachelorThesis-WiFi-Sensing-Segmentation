@@ -6,15 +6,34 @@ import numpy as np
 
 
 class FileFormat(enum.Enum):
-    RAW_OWN = 'raw_own'
+    RAW_OWN = "raw_own"
     # RAW_INTEL_CSI = 'raw_intel_csi'
-    JOBLIB = 'joblib'
-    HDF5 = 'hdf5'
-    MAT_7_3 = 'hdf5'
-    MAT = 'mat'
+    JOBLIB = "joblib"
+    HDF5 = "hdf5"
+    MAT_7_3 = "hdf5"
+    MAT = "mat"
+
 
 class CSI_Struct:
-    def __init__(self, tstamp, channel, chanBW, rate, nr, nc, num_tones, noise, phyerr, rssi, rssi_0, rssi_1, rssi_2, payload_len, csi_len, buf_len):
+    def __init__(
+        self,
+        tstamp,
+        channel,
+        chanBW,
+        rate,
+        nr,
+        nc,
+        num_tones,
+        noise,
+        phyerr,
+        rssi,
+        rssi_0,
+        rssi_1,
+        rssi_2,
+        payload_len,
+        csi_len,
+        buf_len,
+    ):
         self.tstamp = tstamp
         self.channel = channel
         self.chanBW = chanBW
@@ -32,11 +51,17 @@ class CSI_Struct:
         self.csi_len = csi_len
         self.buf_len = buf_len
 
+
 class CSI_Result(NamedTuple):
     status: Optional[list[CSI_Struct]] = None
     csi: np.ndarray = None
 
-class CSIDataLoader(ABC):
+
+class CSIDataManager(ABC):
     @abstractmethod
-    def load(self, filename: str) -> CSI_Result:
+    def load(filename: str) -> CSI_Result:
         """Load CSI data from a file"""
+
+    @abstractmethod
+    def save(filename: str, data: CSI_Result, **save_manager_kwargs) -> None:
+        raise NotImplementedError("This manager does not support saving data")

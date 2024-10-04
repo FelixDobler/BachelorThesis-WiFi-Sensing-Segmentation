@@ -1,18 +1,18 @@
 from typing import Optional
 import numpy as np
 from os.path import splitext
-from .types import FileFormat, CSIDataLoader
-from .csi_formats.own_raw import RawOwnDataLoader
-from .csi_formats.joblib import JoblibDataLoader
-from .csi_formats.hdf5 import HDF5DataLoader
-from .csi_formats.mat import MatDataLoader
+from .types import FileFormat, CSIDataManager
+from .csi_formats.own_raw import RawOwnDataManager
+from .csi_formats.joblib import JoblibDataManager
+from .csi_formats.hdf5 import HDF5DataManager
+from .csi_formats.mat import MatDataManager
 from .stats import get_sample_rate
 from . import config
+
 
 def load(filename: str, format: Optional[FileFormat] = None):
     if format is None:
         format = detect_format(filename)
-        print(f"verbose: {config.be_verbose}")
         if config.be_verbose:
             print(f"Detected file format: {format.name}")
 
@@ -21,18 +21,18 @@ def load(filename: str, format: Optional[FileFormat] = None):
     get_sample_rate(data)
     return data
 
+
 def detect_format(filename: str):
     ext = splitext(filename)[1]
-    # python switch case syntax
     match ext:
-        case '.joblib':
+        case ".joblib":
             return FileFormat.JOBLIB
-        case '.raw' | '.dat' | '':
+        case ".raw" | ".dat" | "":
             return FileFormat.RAW_OWN
-        case '.mat':
+        case ".mat":
             # detect whether the file is hdf5 or mat 7.3
-            hdf5_magic_number = b'\211HDF\r\n\032\n'
-            with open(filename, 'rb') as f:
+            hdf5_magic_number = b"\211HDF\r\n\032\n"
+            with open(filename, "rb") as f:
                 magic_number = f.read(len(hdf5_magic_number))
 
             if magic_number == hdf5_magic_number:
@@ -41,6 +41,7 @@ def detect_format(filename: str):
                 return FileFormat.MAT
         case _:
             raise ValueError(f"Unknown file format: {ext}")
+
 
 def check_csi_shape(data: np.ndarray):
     ...
@@ -52,10 +53,11 @@ def check_csi_shape(data: np.ndarray):
     # else:
     #     raise ValueError(f"Invalid shape for CSI data: {data.shape}")
 
-load_classes : dict[FileFormat, CSIDataLoader] = {
-    FileFormat.RAW_OWN: RawOwnDataLoader,
-    FileFormat.JOBLIB: JoblibDataLoader,
-    FileFormat.HDF5: HDF5DataLoader,
-    FileFormat.MAT_7_3: HDF5DataLoader,
-    FileFormat.MAT: MatDataLoader
+
+load_classes: dict[FileFormat, CSIDataManager] = {
+    FileFormat.RAW_OWN: RawOwnDataManager,
+    FileFormat.JOBLIB: JoblibDataManager,
+    FileFormat.HDF5: HDF5DataManager,
+    FileFormat.MAT_7_3: HDF5DataManager,
+    FileFormat.MAT: MatDataManager,
 }
