@@ -6,10 +6,33 @@ from sys import stdout, stderr
 import signal
 import time
 
+record_manager = None
+
+activities = {
+    1: "boxing",
+    2: "hand swing",
+    3: "picking up",
+    4: "hand raising",
+    5: "running",
+    6: "pushing",
+    7: "squatting",
+    8: "drawing O",
+    9: "walking",
+   10: "drawing X",
+}
+recording_activities = {
+    (1, 2): "iw",
+    (3, 4): "ph",
+    (5, 6): "rp",
+    (7, 8): "sd",
+    (9, 10): "wd",
+}
+
 def stop_handler(signum, frame):
     stop()
     
 def stop():
+    global record_manager
     print("\n------------")
     record_manager.exit()
     FNULL.close()
@@ -53,7 +76,7 @@ class RecordManager:
         self.hostapd = None
         if not self.is_connection_established():
             self.establish_connection()
-        
+
 
     def start_record(self):
         print("Starting recording")
