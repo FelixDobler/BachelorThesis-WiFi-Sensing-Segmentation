@@ -1,0 +1,17 @@
+Station b4:82:c5:58:6b:20 (on wlan1)
+	inactive time:	8380 ms
+	rx bytes:	12860
+	rx packets:	19
+	tx bytes:	5528194
+	tx packets:	5354
+	tx retries:	899
+	tx failed:	112
+	signal:  	-45 dBm
+	signal avg:	-47 dBm
+	tx bitrate:	144.4 MBit/s MCS 15 short GI
+	authorized:	yes
+	authenticated:	yes
+	preamble:	short
+	WMM/WME:	yes
+	MFP:		no
+	TDLS peer:		no
