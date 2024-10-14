@@ -1,0 +1,11 @@
+Connected to b4:82:c5:58:d4:00 (on wlan0)
+	SSID: Atheros_csi_tool
+	freq: 2437
+	RX: 45252 bytes (532 packets)
+	TX: 1405 bytes (7 packets)
+	signal: -30 dBm
+	tx bitrate: 39.0 MBit/s MCS 4
+
+	bss flags:	short-slot-time
+	dtim period:	2
+	beacon int:	100

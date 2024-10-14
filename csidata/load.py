@@ -1,7 +1,14 @@
 from typing import Optional
 import numpy as np
-from os.path import splitext
-from .types import FileFormat, CSIDataManager
+from os.path import splitext, basename
+from .types import (
+    CSI_Result,
+    FileFormat,
+    CSIDataManager,
+    Activity,
+    Sequence,
+    file_name_format,
+)
 from .csi_formats.own_raw import RawOwnDataManager
 from .csi_formats.joblib import JoblibDataManager
 from .csi_formats.hdf5 import HDF5DataManager
@@ -10,7 +17,7 @@ from .stats import get_sample_rate
 from . import config
 
 
-def load(filename: str, format: Optional[FileFormat] = None):
+def load(filename: str, format: Optional[FileFormat] = None) -> CSI_Result:
     if format is None:
         format = detect_format(filename)
         if config.be_verbose:
@@ -18,6 +25,13 @@ def load(filename: str, format: Optional[FileFormat] = None):
 
     data = load_classes[format].load(filename)
     check_csi_shape(data.csi)
+
+    type = get_sequence_activity_from_name(filename)
+    if type is not None:
+        if type in Sequence:
+            data.sequence = type
+        elif type in Activity:
+            data.activity = type
     get_sample_rate(data)
     return data
 
@@ -52,6 +66,23 @@ def check_csi_shape(data: np.ndarray):
     #     return data.reshape((1, *data.shape))
     # else:
     #     raise ValueError(f"Invalid shape for CSI data: {data.shape}")
+
+
+def get_sequence_activity_from_name(
+    filename: str,
+) -> Sequence | Activity | None:
+    result = file_name_format.match(basename(filename))
+    if result is None:
+        return
+
+    result_dict = result.groupdict()
+    print(result_dict)
+    if result_dict["act"] is not None:
+        return Activity(int(result_dict["act"]))
+    elif result_dict["seq"] is not None:
+        return Sequence[result_dict["seq"].upper()]
+    else:
+        return None
 
 
 load_classes: dict[FileFormat, CSIDataManager] = {

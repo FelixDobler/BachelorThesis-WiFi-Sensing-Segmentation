@@ -1,8 +1,14 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 import enum
 from typing import NamedTuple, Optional
 
 import numpy as np
+import re
+
+file_name_format = re.compile(
+    "(?P<ts>\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}[_-]\d{6})(?:_act-(?P<act>[0-9])|_seq-(?P<seq>(?:iw|ph|rp|sd|wd)))?(?:\.(?:raw|dat|joblib|mat))?"
+)
 
 
 class FileFormat(enum.Enum):
@@ -52,9 +58,33 @@ class CSI_Struct:
         self.buf_len = buf_len
 
 
-class CSI_Result(NamedTuple):
+class Activity(enum.Enum):
+    BOXING = 0
+    HAND_SWING = 1
+    PICKING_UP = 2
+    HAND_RAISING = 3
+    RUNNING = 4
+    PUSHING = 5
+    SQUATTING = 6
+    DRAWING_O = 7
+    WALKING = 8
+    DRAWING_X = 9
+
+
+class Sequence(enum.Enum):
+    IW = (Activity.BOXING, Activity.HAND_SWING)
+    PH = (Activity.PICKING_UP, Activity.HAND_RAISING)
+    RP = (Activity.RUNNING, Activity.PUSHING)
+    SD = (Activity.SQUATTING, Activity.DRAWING_O)
+    WD = (Activity.WALKING, Activity.DRAWING_X)
+
+
+@dataclass
+class CSI_Result:
     status: Optional[list[CSI_Struct]] = None
     csi: np.ndarray = None
+    sequence: Optional[Sequence] = None
+    activity: Optional[Activity] = None
 
 
 class CSIDataManager(ABC):
