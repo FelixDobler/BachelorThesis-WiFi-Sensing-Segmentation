@@ -34,7 +34,7 @@ Within each sequence, the user performs each activity 5 times
 40m total
 
 # Users
-- [] Philipp
+- [x] Philipp
 - [] Niclas
 - [] Jann
 - [] Tobias
@@ -50,11 +50,11 @@ Within each sequence, the user performs each activity 5 times
 | 2024-10-11T16-54-58-944612_seq-iw | maybe 6x boxing          |
 | 2024-10-11T16-56-16-370969_seq-iw |                          |
 | 2024-10-11T16-57-15-673881_seq-iw | maybe 6x swing           |
-| 2024-10-11T16-58-25-139337_seq-iw |                          |
+| 2024-10-11T16-58-25-139337_seq-iw | FAULTY VIDEO             |
 | 2024-10-11T16-59-29-810390_seq-iw |                          |
 |                                   |                          |
-| 2024-10-11T17-02-22-296947_seq-ph | maybe 6x picking up      |
-| 2024-10-11T17-04-18-741718_seq-ph | maybe 6x hand raise      |
+| 2024-10-11T17-02-22-296947_seq-ph | 6x picking up            |
+| 2024-10-11T17-04-18-741718_seq-ph | 6x hand raise            |
 | 2024-10-11T17-05-49-170291_seq-ph |                          |
 | 2024-10-11T17-06-48-096612_seq-ph |                          |
 | 2024-10-11T17-09-06-000850_seq-ph |                          |

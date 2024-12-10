@@ -76,7 +76,6 @@ def get_sequence_activity_from_name(
         return
 
     result_dict = result.groupdict()
-    print(result_dict)
     if result_dict["act"] is not None:
         return Activity(int(result_dict["act"]))
     elif result_dict["seq"] is not None:

@@ -48,8 +48,10 @@ class RecordManager:
     ffmpeg = None
     record_video_enabled = True
     record_dir = "/root/record/recordings"
-    record_dir_csi = os.path.join(record_dir, "csi", user)
-    record_dir_video = os.path.join(record_dir, "video", user)
+    record_dir_csi = os.path.join(record_dir, "csi", )
+    # record_dir_csi = os.path.join(record_dir, "csi", user)
+    record_dir_video = os.path.join(record_dir, "video", )
+    # record_dir_video = os.path.join(record_dir, "video", user)
 
     record_sequence = None
 
@@ -116,22 +118,25 @@ class RecordManager:
         )
         # Start Camera recording
         if self.record_video_enabled:
+            video_path_base = os.path.join(self.record_dir_video, self.recording_name)
             self.ffmpeg = subprocess.Popen(
                 [
                     "ffmpeg",
-                    "-v",
-                    "error",
-                    "-f",
-                    "v4l2",
-                    "-input_format",
-                    "mjpeg",
-                    "-framerate",
-                    "60",
-                    "-video_size",
-                    "1280x720",
-                    "-i",
-                    "/dev/video0",
-                    os.path.join(self.record_dir_video, self.recording_name + ".mp4"),
+                    "-v", "error",
+                    "-copyts",
+                    "-f", "v4l2",
+                    "-vsync", "2",
+                    "-input_format", "mjpeg",
+                    "-framerate", "60",
+                    "-video_size", "1280x720",
+                    "-timestamps", "abs",
+                    "-i", "/dev/video0",
+                    "-vsync", "2",
+                    "-vf", "setpts=PTS-STARTPTS",
+                    video_path_base + ".mp4",
+                    "-vsync", "2",
+                    "-f", "mkvtimestamp_v2",
+                    video_path_base + ".txt"
                 ],
                 stdout=FNULL,
                 stderr=subprocess.PIPE,
@@ -231,6 +236,8 @@ class RecordManager:
 
         # connect
         run(["/root/activate_wifi.sh"], handle=True, stdout=FNULL)
+
+        time.sleep(1)
 
         if not self.is_connection_established():
             print("Connection to BaProj1 could not be established")

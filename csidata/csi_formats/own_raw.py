@@ -16,25 +16,22 @@ class RawOwnDataManager(CSIDataManager):
         ap_values_format,
         ap_format_size,
         amplitudeOnly,
-        bigChannel,
+        nSubC,
         currentRecordNumber,
     ):
         for rx in range(3):
             for tx in range(3):
-                # for _ in range(114):
                 data = f.read(ap_format_size)
 
                 values = struct.unpack(ap_values_format, data)
+                real_imag = np.array(values, dtype=np.int16).reshape((nSubC, 2))
 
-                if not amplitudeOnly:
-                    #
-                    csiMatrix[currentRecordNumber, rx, tx] = np.array(
-                        values, dtype=np.int16
-                    ).reshape((114, 2))
+                # calculate the amplitude (and phase) of the complex number
+                if amplitudeOnly:
+                    csiMatrix[currentRecordNumber, rx, tx] = np.hypot(real_imag[:, 0], real_imag[:, 1])
                 else:
-                    csiMatrix[currentRecordNumber, rx, tx] = np.array(
-                        values, dtype=np.int16
-                    )
+                    csiMatrix[currentRecordNumber, rx, tx, 0] = np.hypot(real_imag[:, 0], real_imag[:, 1])
+                    csiMatrix[currentRecordNumber, rx, tx, 1] = np.arctan2(real_imag[:, 1], real_imag[:, 0])
 
     def load(
         filename, amplitudeOnly=True, bigChannel=False, verbose=False
@@ -45,8 +42,8 @@ class RawOwnDataManager(CSIDataManager):
         csi_struct_format = "QHBBBBBBBBBBBHHHxxxx"
         csi_struct_size = struct.calcsize(csi_struct_format)
 
-        # define the COMPLEX binary format, real and imag are next to each other. Discard the imaginary(phase) part if amplitudeOnly is True
-        csi_single_value_format = "ixxxx" if amplitudeOnly else "ii"
+        # define the COMPLEX binary format, real and imag are next to each other.
+        csi_single_value_format = "ii"
 
         if bigChannel:
             csi_antenna_pair_format = csi_single_value_format * nSubC
@@ -60,10 +57,6 @@ class RawOwnDataManager(CSIDataManager):
         csi_frame_size = 3 * 3 * csi_antenna_pair_format_size
 
         record_size = csi_struct_size + csi_frame_size
-
-        # print(f"csi_struct_size: {csi_struct_size}")
-        # print(f"csi_matrix_size: {csi_matrix_size}")
-        # print(f"record_size: {record_size}")
 
         with open(filename, "rb") as f:
             f.seek(0, 2)
@@ -102,7 +95,7 @@ class RawOwnDataManager(CSIDataManager):
                     csi_antenna_pair_format,
                     csi_antenna_pair_format_size,
                     amplitudeOnly,
-                    bigChannel,
+                    nSubC,
                     currentRecordNumber,
                 )
 
