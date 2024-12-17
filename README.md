@@ -1,6 +1,4 @@
-# BachelorProjekt
-
-
+# BachelorThesis
 
 ## Getting started
 

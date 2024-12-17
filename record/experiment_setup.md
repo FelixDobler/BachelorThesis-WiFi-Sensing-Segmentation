@@ -34,14 +34,9 @@ Within each sequence, the user performs each activity 5 times
 40m total
 
 # Users
-- [x] Philipp
-- [] Niclas
-- [] Jann
-- [] Tobias
-- [] Sia
-- [] Gio
+- [x] user1
 
-## Philipp (User1)
+## User1
 | recording name                    | note                     |
 | --------------------------------- | ------------------------ |
 | 2024-10-11T16-49-24-891620_seq-iw |                          |

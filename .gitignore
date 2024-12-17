@@ -1,4 +1,5 @@
 .venv/
+.venv2/
 .vscode
 *.py[cod]
 __pycache__/
@@ -11,3 +12,4 @@ record/prod_data/bak
 record/prod_data/csi
 record/prod_data/sendTimings
 record/prod_data/video
+data/*
