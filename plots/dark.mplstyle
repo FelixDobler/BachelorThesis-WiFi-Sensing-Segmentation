@@ -1,0 +1,10 @@
+# text_color = '#efefef'
+# background_color = '#323232'
+
+text.color : "#efefef"
+axes.labelcolor : "#efefef"
+axes.edgecolor : "#efefef"
+xtick.color : "#efefef"
+ytick.color : "#efefef"
+axes.facecolor : "#323232"
+figure.facecolor : "#323232"
