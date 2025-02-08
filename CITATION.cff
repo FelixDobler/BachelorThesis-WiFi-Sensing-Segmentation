@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: >-
+  Evaluating the Generalisability of Segmentation Methods in
+  Wifi Sensing
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Felix
+    family-names: Dobler
+    orcid: 'https://orcid.org/0009-0006-4846-9352'
+    email: felix.dobler.fd@gmail.com
+repository-code: >-
+  https://github.com/FelixDobler/BachelorThesis-WiFi-Sensing-Segmentation
+keywords:
+  - WiFi Sensing
+  - Segmentation
+  - CSI
+  - Activity Recognition
+license: AGPL-3.0
