@@ -23,9 +23,6 @@
                 "Mount video",
                 "Refresh file view"
             ],
-            "runOptions": {
-                "runOn": "folderOpen"
-            }
         },
         {
             "label": "Mount csi",
