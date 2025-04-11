@@ -1,3 +1,6 @@
 [submodule "DeepSeg"]
 	path = DeepSeg
 	url = git@github.com:FelixDobler/DeepSeg.git
+[submodule "record/Atheros-CSI-Tool-UserSpace-APP"]
+	path = record/Atheros-CSI-Tool-UserSpace-APP
+	url = git@github.com:FelixDobler/Atheros-CSI-Tool-UserSpace-APP.git
